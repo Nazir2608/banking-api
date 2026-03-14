@@ -1,6 +1,5 @@
-version: '3.8'
-
 services:
+
   mysql:
     image: mysql:9.5
     container_name: banking_mysql
@@ -11,22 +10,28 @@ services:
       - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
   redis:
     image: redis:7-alpine
     container_name: banking_redis
     ports:
       - "6379:6379"
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+
+  banking-api:
+    build: .
+    container_name: banking_api
+    depends_on:
+      - mysql
+      - redis
+    ports:
+      - "8081:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/banking_db
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: MySql@123
+      SPRING_REDIS_HOST: redis
+      SPRING_REDIS_PORT: 6379
+    restart: unless-stopped
 
 volumes:
   mysql_data:
