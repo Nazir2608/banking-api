@@ -19,6 +19,9 @@ WORKDIR /app
 # Create non-root user
 RUN addgroup -S banking && adduser -S banking -G banking
 
+# create log directory
+RUN mkdir -p /var/log/banking-api && chown -R banking:banking /var/log/banking-api
+
 # Copy jar from build stage
 COPY --from=builder /app/target/*.jar app.jar
 

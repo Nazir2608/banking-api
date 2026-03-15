@@ -1,37 +1,96 @@
+version: "3.9"
+
 services:
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: banking-api
+    ports:
+      - "8080:8080"
+
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+
+      DB_URL: jdbc:mysql://mysql:3306/banking_db
+      DB_USERNAME: root
+      DB_PASSWORD: MySql@123
+
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+
+      JWT_SECRET: 5A7134743777217A25432A462D4A614E645267556B58703272357538782F413F
+
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+    networks:
+      - banking-network
+
+    restart: unless-stopped
+
+
 
   mysql:
     image: mysql:9.5
-    container_name: banking_mysql
+    container_name: banking-mysql
+
     environment:
-      MYSQL_ROOT_PASSWORD: MySql@123
       MYSQL_DATABASE: banking_db
+      MYSQL_ROOT_PASSWORD: MySql@123
+
     ports:
       - "3307:3306"
+
     volumes:
       - mysql_data:/var/lib/mysql
 
+    networks:
+      - banking-network
+
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-pMySql@123"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+    restart: unless-stopped
+
+
+
   redis:
     image: redis:7-alpine
-    container_name: banking_redis
+    container_name: banking-redis
+
     ports:
       - "6379:6379"
 
-  banking-api:
-    build: .
-    container_name: banking_api
-    depends_on:
-      - mysql
-      - redis
-    ports:
-      - "8081:8080"
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/banking_db
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: MySql@123
-      SPRING_REDIS_HOST: redis
-      SPRING_REDIS_PORT: 6379
+    volumes:
+      - redis_data:/data
+
+    networks:
+      - banking-network
+
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
     restart: unless-stopped
+
+
 
 volumes:
   mysql_data:
+  redis_data:
+
+
+
+networks:
+  banking-network:
+    driver: bridge
