@@ -26,17 +26,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private final StringRedisTemplate redisTemplate;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain chain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
         String header = request.getHeader("Authorization");
         if (header == null || !header.startsWith("Bearer ")) {
             chain.doFilter(request, response);
             return;
         }
-
         String token = header.substring(7);
-
         try {
             Boolean blacklisted = redisTemplate.hasKey("blacklist:" + token);
             if (Boolean.TRUE.equals(blacklisted)) {
@@ -51,8 +47,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             String email = jwtTokenProvider.extractEmail(token);
             UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
-            UsernamePasswordAuthenticationToken auth =
-                    new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+            UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
             auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(auth);
         }

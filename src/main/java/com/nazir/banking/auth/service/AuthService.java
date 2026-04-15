@@ -47,8 +47,7 @@ public class AuthService {
     }
 
     public AuthResponse login(LoginRequest request) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
 
         User user = userRepository.findByEmail(request.getEmail()).orElseThrow();
         return buildAuthResponse(user);
@@ -67,8 +66,7 @@ public class AuthService {
         }
 
         String email = jwtTokenProvider.extractEmail(token);
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new BadRequestException("User not found"));
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new BadRequestException("User not found"));
 
         return buildAuthResponse(user);
     }
@@ -83,11 +81,7 @@ public class AuthService {
         String accessToken = jwtTokenProvider.generateAccessToken(user.getEmail(), user.getRole().name(), user.getId());
         String refreshToken = jwtTokenProvider.generateRefreshToken(user.getEmail());
 
-        redisTemplate.opsForValue().set(
-                "refresh:" + user.getId(),
-                refreshToken,
-                Duration.ofMillis(jwtTokenProvider.getRefreshTokenExpirationMs())
-        );
+        redisTemplate.opsForValue().set("refresh:" + user.getId(), refreshToken, Duration.ofMillis(jwtTokenProvider.getRefreshTokenExpirationMs()));
 
         return AuthResponse.builder()
                 .userId(user.getId())

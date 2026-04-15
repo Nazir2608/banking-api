@@ -1,4 +1,4 @@
-package com.nazir.banking.report.controller;
+package com.nazir.banking.report;
 
 import com.nazir.banking.account.entity.Account;
 import com.nazir.banking.account.service.AccountService;

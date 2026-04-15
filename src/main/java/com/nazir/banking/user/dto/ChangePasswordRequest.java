@@ -13,8 +13,7 @@ public class ChangePasswordRequest {
     private String currentPassword;
 
     @NotBlank
-    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$",
-             message = "Password must be at least 8 chars with upper, lower, digit and special character")
+    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$", message = "Password must be at least 8 chars with upper, lower, digit and special character")
     private String newPassword;
 
     @NotBlank
