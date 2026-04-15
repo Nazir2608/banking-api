@@ -60,8 +60,7 @@ public class UserController {
     @PutMapping("/v1/admin/users/{id}/status")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Enable or disable a user (admin)")
-    public ResponseEntity<ApiResponse<UserResponse>> updateUserStatus(@PathVariable String id,
-                                                                       @RequestParam boolean active) {
+    public ResponseEntity<ApiResponse<UserResponse>> updateUserStatus(@PathVariable String id, @RequestParam boolean active) {
         return ResponseEntity.ok(ApiResponse.success(userService.updateUserStatus(id, active)));
     }
 }
