@@ -63,14 +63,12 @@ public class UserService {
 
     @Transactional
     public UserResponse updateUserStatus(String id, boolean active) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> ResourceNotFoundException.of("User", id));
+        User user = userRepository.findById(id).orElseThrow(() -> ResourceNotFoundException.of("User", id));
         user.setActive(active);
         return UserResponse.from(userRepository.save(user));
     }
 
     private User findByEmail(String email) {
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> ResourceNotFoundException.of("User", email));
+        return userRepository.findByEmail(email).orElseThrow(() -> ResourceNotFoundException.of("User", email));
     }
 }
